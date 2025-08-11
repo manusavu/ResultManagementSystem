@@ -1,0 +1,19 @@
+.container{
+    border:2px solid rgb(180, 151, 151);
+    height:500px;
+}
+.biodata{
+    display:inline-block;
+    border:2px solid rgb(215, 215, 215);
+    margin-left: 450px;
+    margin-top: 150px;
+    /* border-radius: 20px; */
+    padding: 30px;
+}
+.results{
+    display:inline-block;
+    border:2px solid rgb(255, 255, 255);
+    margin-left: 100px;
+    /* border-radius: 20px; */
+    padding: 30px;
+}

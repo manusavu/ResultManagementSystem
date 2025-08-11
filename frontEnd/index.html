@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+    <header>
+        <h1>Result Management System</h1>
+    </header>
+    <div class="container">
+        <marquee behavior="slide" direction=""></marquee>
+        <div id="student_form">
+            <h1>Student Page</h1>
+            <form action="Student.html" autocomplete="off">
+                <label for="username">Username :</label>
+                <input type="text" id="username" pattern="21331[a-c][0-9]{2}[a-z][0-9]" title="Username should be your registered number with small letters! "><br><br>
+                <label for="password">Password  : </label>
+                <input type="password" id="password" minlength="8"><br><br>
+                <button type="submit" name="Submit">Login</button>
+            </form>
+        </div>
+        <div id="admin_form">
+            <h1>Admin page</h1>
+            <form action="admin.html" autocomplete="off">
+                <label for="username">Username :</label>
+                <input type="text" id="username"><br><br>
+                <label for="password">Password  :</label>
+                <input type="password" id="password" minlength="8"><br><br>
+                <button type="submit" name="Submit">Login</button>
+            </form>
+        </div>
+    </div>
+    </center>
+</body>
+</html>
