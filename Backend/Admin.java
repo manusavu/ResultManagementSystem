@@ -14,6 +14,36 @@ public class Admin {
 	Admin(Scanner scanner){
 		this.inp = scanner;
 	}
+
+	public boolean rollNumberExists(Connection con, String rollNumber) {
+	  
+	        String query = "SELECT COUNT(*) FROM STUDENTS WHERE ROLLNUMBER = ?";
+	        
+	        try {
+	        	PreparedStatement ps = con.prepareStatement(query);
+	            
+	            ps.setString(1, rollNumber);
+	            
+	            
+	        	try{
+	        		ResultSet rs = ps.executeQuery();
+	                
+	                if (rs.next()) {
+	                    int count = rs.getInt(1);
+	                    
+	                    return count > 0;
+	                }
+	        	}catch(SQLException e) {
+		            System.out.println("Error checking if roll number exists: " + e.getMessage());
+	        	}
+	        } catch (SQLException e) {
+	            System.out.println("Error checking if roll number exists: " + e.getMessage());
+	        
+//	            e.printStackTrace();
+	        }
+	        return false;
+		
+	}
 	public boolean addStudentDetails(Connection con) {
 		System.out.println("Enter Student's id: ");
 		boolean ans = false;
@@ -21,8 +51,12 @@ public class Admin {
 		System.out.println("Enter Student's Name: ");
 		String name = inp.next();
 		System.out.println("Enter Student's Roll Number: ");
-		String Roll_Num = inp.next();
+		String Roll_Num = inp.next().toUpperCase(); 
+		if(!rollNumberExists(con,Roll_Num)) {
+		System.out.println("Enter DateofBirth(dd/mm/yyyy): ");
+		String dob = inp.next();
 		String query = "INSERT INTO STUDENTS(ID,NAME,ROLLNUMBER) VALUES(?,?,?)";
+		String q1 = "INSERT INTO PASSWORDS(ROLLNUMBER,PASSWORD)VALUES(?,?)";
 		String q2  = "INSERT INTO MARKS(ID,MATHS,PHYSICS,CHEMISTRY) VALUES(?,?,?,?)";
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
@@ -31,12 +65,17 @@ public class Admin {
 			ps.setString(3, Roll_Num);
 			int res = ps.executeUpdate();
 			if(res>0) {
+				ps = con.prepareStatement(q1);
+				ps.setString(1, Roll_Num);
+				ps.setString(2, dob);
+				res = ps.executeUpdate();
+				if(res>0) {
 				System.out.println("-----      Marks Details     --------");
-				System.out.println("Enter Maths Marks: ");
+				System.out.println("Enter Maths Points: ");
 				Double maths = inp.nextDouble();
-				System.out.println("Enter Physics Marks: ");
+				System.out.println("Enter Physics Points: ");
 				Double physics = inp.nextDouble();
-				System.out.println("Enter Chemistry Marks: ");
+				System.out.println("Enter Chemistry Points: ");
 				Double chemistry = inp.nextDouble();
 				ps = con.prepareStatement(q2);
 				ps.setDouble(2, maths);
@@ -44,9 +83,12 @@ public class Admin {
 				ps.setDouble(4, chemistry);
 				ps.setInt(1, stu_id);
 				res = ps.executeUpdate();
-				
-				if(res>0) {
-					ans = true;
+					if(res>0) {
+						ans = true;
+					}
+					else {
+						ans = false;
+					}
 				}
 				else {
 					ans = false;
@@ -60,6 +102,9 @@ public class Admin {
 		}catch(SQLException e) {
 //			e.printStackTrace();
 			System.out.println("Error Connecting with Database");
+		}}
+		else {
+			System.out.println("User is already present!");
 		}
 		return ans;
 		
@@ -68,6 +113,9 @@ public class Admin {
 		int ret=-1;
 		System.out.println("Enter the students id: ");
 		int stu_id = inp.nextInt();
+		System.out.println("Enter Students Roll Number: ");
+		String roll_Num = inp.next();
+		if(rollNumberExists(con,roll_Num)) {
 		System.out.println("Enter the subject name: ");
 		String subject = inp.next();
 		System.out.println("Enter the updated marks: ");
@@ -84,14 +132,19 @@ public class Admin {
 		}catch(SQLException e) {
 			System.out.println("Error Connecting with Database");
 //			e.printStackTrace();
+		}}
+		else {
+			System.out.println("User not found");
 		}
-		
 		return ret>0;
 	}
 	public boolean deleteRecord(Connection con) {
 		int ret = -1;
 		System.out.println("Enter the students id: ");
 		int stu_id = inp.nextInt();
+		System.out.println("Enter Students Roll Number: ");
+		String roll_Num = inp.next();
+		if(rollNumberExists(con,roll_Num)) {
 		String q1 = "DELETE FROM STUDENTS WHERE ID = ?";
 		try {
 		PreparedStatement p1 = con.prepareStatement(q1);
@@ -101,8 +154,12 @@ public class Admin {
 		p1.close();
 		}catch(SQLException e) {
 			System.out.println("Error connection to database!");
-//			e.printStackTrace();
+			e.printStackTrace();
+		}}
+		else {
+			System.out.println("User not found");
 		}
+		
 		return ret>0;
 		
 	}
@@ -134,7 +191,7 @@ public class Admin {
 				}
 			}
 			System.out.println();
-			for(int i=0;i<50;i++) {
+			for(int i=0;i<l+30;i++) {
 				System.out.print("_");
 			}
 			System.out.println();
@@ -158,9 +215,9 @@ public class Admin {
 		}
 		
 	}
-	public void displayStudentRecord(Connection con) {
-		System.out.println("Enter the students id: ");
-		int stu_id = inp.nextInt();
+	public void displayStudentRecord(Connection con,int id) {
+//		System.out.println("Enter the students id: ");
+		int stu_id = id;
 		String query = "SELECT S.ID,S.NAME,S.ROLLNUMBER,M.MATHS,M.PHYSICS,M.CHEMISTRY FROM STUDENTS AS S JOIN MARKS AS M ON S.ID = M.ID WHERE S.ID = ?;";
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
@@ -189,7 +246,7 @@ public class Admin {
 				}
 			}
 			System.out.println();
-			for(int i=0;i<50;i++) {
+			for(int i=0;i<l+30;i++) {
 				System.out.print("_");
 			}
 			System.out.println();
@@ -211,7 +268,6 @@ public class Admin {
 			catch(SQLException e) {
 			System.out.println("Error Connecting to the Database");
 		}
-		
 		
 	}
 
